@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Insert title here</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+</head>
+<body>
+<div class="layui-card" style="margin: 18px;">
+	<div class="layui-card-head">
+		<div class="layui-form">
+			<div class="layui-form-item" style="margin-left: -24px;">
+				<div class="layui-inline">
+					<label class="layui-form-label">查询条件:</label>
+				</div>
+				<div class="layui-inline">
+					<div class="layui-input-inline" style="width:200px">
+						<input type="text" class="layui-input" id="begindate" placeholder="起始时间" style="display:inline-block;width:80px">
+						<span>~</span>
+						<input type="text" class="layui-input" id="enddate" placeholder="截止时间" style="display:inline-block;width:80px">
+					</div>
+				</div>
+				
+				<div class="layui-inline">
+					<div class="layui-input-inline" style="width:200px">
+						<input type="text" class="layui-input" id="beginnum" placeholder="最低价" style="display:inline-block;width:80px">
+						<span>~</span>
+						<input type="text" class="layui-input" id="endnum" placeholder="最高价" style="display:inline-block;width:80px">
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<hr>
+	<div class="layui-card-body" style="height: 100%">
+		<button class="layui-btn layui-btn-primary layui-btn-sm" id="xlsdownload">导出Excel</button>
+		<button class="layui-btn layui-btn-normal layui-btn-sm" id="search">查询</button>
+		
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<td>ID</td>
+					<td>商品图片</td>
+					<td>商品名称</td>
+					<td>商品单价</td>
+					<td>当前库存</td>
+					<td>发布时间</td>
+					<td>商品状态</td>
+					<td>操作</td>
+				</tr>
+			</thead>
+			<tbody id="body"></tbody>
+		</table>		
+	</div>
+</div>
+<iframe id="downloadXls" style="display:none;"></iframe>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+var imgBaseUrl="images/goods/";
+function downloadXls(){
+	bdate=$('#begindate').val();
+	edate=$('#enddate').val();
+	bnum=$('#beginnum').val();
+	endnum=$('#endnum').val();
+	$('#downloadXls').attr('src','adminController?m=xlsdownload&type=1&bdate='+bdate+'&edate='+edate+'&bnum='+bnum+'&endnum'+endnum);
+}
+
+function showGoods(o){
+	json=JSON.parse(o);
+	size=json.length;
+	$('#body').html('');
+	tr="<tr></tr>";
+	for(i=0;i<size;i++){
+		$('#body').append(tr);
+	}
+	$('#body tr').each(function(i){
+		$(this).append("<td>"+json[i].id+"</td>");
+		$(this).append("<td><img src=\""+imgBaseUrl+json[i].imgurl+"\"></td>");
+		$(this).append("<td>"+json[i].name+"</td>");
+		$(this).append("<td>"+json[i].price+"</td>");
+		$(this).append("<td>"+json[i].nownum+"</td>");
+		$(this).append("<td>"+json[i].date+"</td>");
+		$(this).append("<td>"+json[i].status+"</td>");
+		btn="<button class='layui-btn layui-btn-danger layui-btn-sm' id='status'><i class='layui-icon layui-icon-delete'></i>下架</button>";
+		if(!json[i].statustype){
+			btn="<button class='layui-btn layui-btn-danger layui-btn-sm layui-btn-disabled' id=''>等待商家处理</button>";
+		}
+		$(this).append("<td>"+btn+"</td>");
+	})
+	
+	$('#body button').each(function(i){
+		if($(this).attr('id')=='status'){
+		
+			$(this).click(function(){
+				layer.confirm('确认下架该商品吗？', {icon: 3, title:'下架商品'}, function(index){
+					$.post(
+							'adminController',
+							{'m':'changegoodsstatus','id':json[i].id},
+							function(o){
+								if(o=='该商品已下架'){
+									layer.msg('下架成功');
+									getGoodsList();
+								}else{
+									layer.msg('下架失败');
+								}
+							}
+						)
+					  layer.close(index);
+					});
+			})
+			
+		}
+})
+}
+
+$(function(){
+	
+	getGoodsList();
+	
+	layui.form.on('select(query)', function(data){
+	  	opt=data.value;
+	  	getUserList(opt);
+	}); 
+	
+	$('#search').click(function(){
+		getOrdersList();
+		
+	})
+	
+	$('#xlsdownload').click(function(){
+		downloadXls();
+	})
+	
+	layui.laydate.render({
+		elem:'#begindate'
+		,type:'datetime'
+	})
+	layui.laydate.render({
+		elem:'#enddate'
+		,type:'datetime'
+	})
+})
+
+function getGoodsList(){
+	bdate=$('#begindate').val();
+	edate=$('#enddate').val();
+	bnum=$('#beginnum').val();
+	endnum=$('#endnum').val();
+	$.post(
+		'adminController'
+		,{'m':'getgoodslist','begindate':bdate,'enddate':edate,'beginnum':bnum,'endnum':endnum}
+		,function(o){
+			showGoods(o);
+		}
+	)
+}
+
+</script>
+</html>

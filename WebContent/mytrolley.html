@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>购物车界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+body{background-color: white;}
+.container{
+	margin: auto;
+	padding: 0px;
+	width: 100%;
+	height: 550px;
+	overflow: visible;
+}
+.btn{
+	position: fixed;
+	left: 750px;
+	bottom: 5px;
+}
+.count{
+	position: fixed;
+	left: 35px;
+	bottom: 5px;
+}
+.tip{
+	font-family: cursive;
+	font-weight: 350;
+	font-size: 15px;
+}
+.sum{
+	font-family: cursive;
+	font-weight: 650;
+	font-size: 25px;
+	color: red;
+}
+.footer{
+	position: fixed;
+	left: 0px;
+	bottom: 0px;
+	width: 100%;
+	height: 45px;
+	background-color: #dddddd;
+}
+.layui-table{
+	margin-bottom:40px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+	<table class="layui-table">
+	
+	<thead>
+		<tr>
+			<td>商品名称</td>
+			<td>商品图片</td>
+			<td>商品详情</td>
+			<td>商品单价</td>
+			<td>购买数量</td>
+			<td>小计</td>
+			<td>商家昵称</td>
+			<td>操作</td>
+		</tr>
+	</thead>
+	<tbody class="main">
+		
+	</tbody>
+	</table>
+</div>
+	<div class="footer">
+		<div class="count"><span class="tip">总金额：</span><label class="sum"></label><span class="tip">元</span></div>
+		<div class="btn"><button class="layui-btn layui-btn-radius layui-btn-primary" id="deleteall">清空购物车</button>
+		<button class="layui-btn layui-btn-radius" id="buy">立即购买</button></div>
+	</div>
+
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+var userid=getUrlPara('userid');
+$(function(){
+	var userid=getUrlPara('userid');
+	var json;
+	var size;
+	var sum=0;
+	$.post(
+		'/shoppingplus/my_trolley',
+		{'userid':userid},
+		function(obj){
+			json=JSON.parse(obj);
+			size=json.length;
+			tr='<tr></tr>';
+			if(size<1)
+				$('body').html('购物车空空如也哦').css({'margin':'auto','text-align':'center','margin-top':'150px','font-size':'45px','font-family':'cursive','font-weight':'800'});
+			else{
+				for(i=0;i<size;i++)
+					$('.main').append(tr);
+				$('.main tr').each(function(i){
+					$(this).append('<td>'+json[i].goods+'</td>');
+					$(this).append('<td><img></td>');
+					$(this).append('<td>'+json[i].remark+'</td>');
+					$(this).append('<td>'+json[i].price+'元</td>');
+					$(this).append('<td>'+json[i].num+'件</td>');
+					$(this).append('<td>'+json[i].sum+'元</td>');
+					$(this).append('<td>'+json[i].seller+'</td>');
+					$(this).append("<td><button class='layui-btn' id='delete'><i class='layui-icon layui-icon-delete'></i>删除</button></td>");
+				})
+				$('.main img').each(function(i){
+					$(this).attr('src','images/goods/'+json[i].imgurl);
+				})
+		
+					
+				$('#delete').each(function(i){      //删除按钮触发事件
+					$(this).click(function(){
+						$.post(
+							'/shoppingplus/remove_trolley',
+							{'goodsid':json[i].goodsid,'userid':userid,'type':0},
+							function(msg){
+								setTimeout(function(){location.reload();},1000);
+								layer.msg(msg);
+							}	
+						)
+					})
+				})
+				$('#deleteall').click(function(){         //清空购物车操作
+					$.post(
+							'/shoppingplus/remove_trolley',
+							{'goodsid':null,'userid':userid,'type':1},
+							function(msg){
+								setTimeout(function(){location.reload();},1000);
+								layer.msg(msg);
+							}	
+						)
+				})
+				$('#buy').click(function(){       //立即购买操作
+					var allgoodsid="";
+					for(i=0;i<size;i++)
+						allgoodsid+=json[i].goodsid+";";
+					$.post(
+						'/shoppingplus/trade',
+						{'userid':userid,'allgoodsid':allgoodsid},
+						function(msg){
+							if(msg=='恭喜您，购买成功。'){
+								alert(msg);
+								location.reload();
+							}
+							else layer.msg(msg);
+							
+						}
+					)
+				})
+				for(i=0;i<size;i++)                //计算总金额操作
+					sum+=parseFloat(json[i].sum);
+				$('.sum').text(sum);
+			}
+		}
+	)
+})
+</script>
+</html>

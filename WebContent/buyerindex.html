@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<title>用户界面</title>
+<style type="text/css">
+.frame{width: 100%;height: 100%;border: 0px;}
+.frame iframe{width: 100%;height: 100%;border: 0px;background-color:#f5f5f5; }
+.search input{display: inline-block;width: 400px;margin: 12px 0px 0px 400px;}
+.search button{display: inline-block;margin:12px 0px 15px;width: 80px; }
+</style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo" style="font-size: 35px;font-family: cursive;">fmall</div>
+    <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item">
+      	<a href="javascript:;">商品导航</a>
+      	<dl class="layui-nav-child">
+          <dd><a href="javascript:;" id="demo1">运动服饰</a></dd>
+          <dd><a href="javascript:;" id="demo2">居家服饰</a></dd>
+          <dd><a href="javascript:;" id="demo3">情侣专卖</a></dd>
+          <dd><a href="javascript:;" id="demo4">美妆服饰</a></dd>
+          <dd><a href="javascript:;" id="demo5">老年服饰</a></dd>
+        </dl>
+      </li>
+    </ul>
+   <div class="search">
+  		<input type="text" placeholder="搜索：商品名称/商家昵称" name="searchname" class="layui-input">
+  		<button class="layui-btn">搜索</button>
+  	</div>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="" class="layui-nav-img" id="img"><span class="name"></span>
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+          <dd><a href="javascript:;" id="test1">更换头像</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a href="javascript:;" id="out">退了</a></li>
+    </ul>
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+        <li class="layui-nav-item">
+          <a href="javascript:;" >订单管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" id="orders">全部订单</a></dd>
+            <dd><a href="javascript:;" id="trolley">购物车</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item"><a href="javascript:;" id="charge">账户充值</a></li>
+        <li class="layui-nav-item"><a href="https://home.cnblogs.com/u/haheihei/" target="_blank">关于我们</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body" style="overflow: hidden;">
+    <div class="frame"><iframe src="" name="frame_a" id="frame_a"></iframe></div>
+  </div>
+  
+  <div class="layui-footer">
+    © fmall购物，享受品质生活
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+var id=getUrlPara("id");           //获取id作为全局变量
+
+layui.use('element', function(){    //layui模块加载
+	  var element = layui.element;
+	  
+	});
+$(function(){                  //获取用户名、图片修饰
+	$.post(
+		'/shoppingplus/getUsername',
+		{"id":getUrlPara("id")},
+		function(msg){
+			name=msg.split(';')[0];
+			url=msg.split(';')[1];
+			$('.name').text(name);
+			$('#img').attr('src',"images/user/"+url);
+		}
+	)
+	
+})
+
+window.onunload=function(){       //页面离开更改状态
+	$.post(
+		'/shoppingplus/changeonlinestatus',
+		{'id':getUrlPara('id')},
+	)
+}
+
+$('#out').click(function(){       //账户退出
+	$.post(
+		'/shoppingplus/changeonlinestatus',
+		{'id':getUrlPara('id')},
+		function(){
+			layer.msg('您已成功退出');
+			setTimeout(function(){location='./login.html';},800);
+		}
+	)
+})
+
+layui.use('upload', function(){          //更换头像
+	var $ = layui.jquery
+	  ,upload = layui.upload;
+	  
+	  //普通图片上传
+	  var uploadInst = upload.render({
+	    elem: '#test1'
+	    ,url: '/shoppingplus/changeimg?id='+id 
+	    ,done: function(res){
+	      if(res.code > 0){     //如果上传失败
+	        return layer.msg('上传失败');
+	      }else if(res.code==0){
+	    	  $('#img').attr('src','images/user/'+res.msg);
+	    	  return layer.msg('上传成功');
+	      }
+	      //上传成功
+	    }
+	  });
+	});
+
+$('.search button').click(function(){   //展示商品页面
+	$('#frame_a').attr('src','./showgoods.html?id='+id+'&name='+$('input[name=searchname]').val());
+})
+$('#trolley').click(function(){       //展示购物车
+	$('#frame_a').attr('src','./mytrolley.html?userid='+id);
+})
+$('#orders').click(function(){        //展示订单
+	$('#frame_a').attr('src','./buyerorders.html?userid='+id);
+})
+$('#demo1').click(function(){        //展示分类商品
+	$('#frame_a').attr('src','./showclassedgoods.html?userid='+id+'&type=0');
+})
+$('#demo2').click(function(){        
+	$('#frame_a').attr('src','./showclassedgoods.html?userid='+id+'&type=1');
+})
+$('#demo3').click(function(){        
+	$('#frame_a').attr('src','./showclassedgoods.html?userid='+id+'&type=2');
+})
+$('#demo4').click(function(){        
+	$('#frame_a').attr('src','./showclassedgoods.html?userid='+id+'&type=3');
+})
+$('#demo5').click(function(){        
+	$('#frame_a').attr('src','./showclassedgoods.html?userid='+id+'&type=4');
+})
+//展示分类商品END
+
+$('#charge').click(function(){                 //账户充值
+	var money=prompt('请输入充值金额');
+	if(money==''||money==null)
+		layer.msg('操作取消');
+	else if(!/^[1-9][0-9]{0,}/.test(money))
+		layer.msg('输入数值不符合格式');
+	else {
+		$.post(
+			'/shoppingplus/chargemoney',
+			{'money':money,'id':id},
+			function(msg){
+				layer.msg(msg);
+			}
+		)
+	}
+})
+</script>
+</html>

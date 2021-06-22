@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Insert title here</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+</head>
+<body>
+<div class="layui-card" style="margin: 18px;">
+	<div class="layui-card-head">
+		<div class="layui-form">
+			<div class="layui-form-item" style="margin-top: 4px;margin-left: -24px;">
+				<label class="layui-form-label">查询用户</label>
+				<div class="layui-input-block" style="width:120px">
+					<select lay-filter="query">
+						<option value="0">全部用户</option>
+						<option value="1">普通用户</option>
+						<option value="2">商户</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="layui-card-body" style="height: 100%">
+		<button class="layui-btn layui-btn-sm" id="adduser">添加</button>
+		<button class="layui-btn layui-btn-primary layui-btn-sm" id="xlsdownload">导出Excel</button>
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<td>昵称</td>
+					<td>性别</td>
+					<td>身份</td>
+					<td>地区</td>
+					<td>手机号</td>
+					<td>注册时间</td>
+					<td>操作</td>
+				</tr>
+			</thead>
+			<tbody id="body"></tbody>
+		</table>		
+	</div>
+</div>
+<iframe id="downloadXls" style="display:none;"></iframe>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+
+function downloadXls(){
+	$('#downloadXls').attr('src','adminController?m=xlsdownload&type=0');
+}
+
+function showUserList(o){
+	json=JSON.parse(o);
+	size=json.length;
+	$('#body').html('');
+	tr="<tr></tr>";
+	for(i=0;i<size;i++){
+		$('#body').append(tr);
+	}
+	$('#body tr').each(function(i){
+		$(this).append("<td>"+json[i].name+"</td>");
+		$(this).append("<td>"+json[i].sex+"</td>");
+		$(this).append("<td>"+json[i].status+"</td>");
+		$(this).append("<td>"+json[i].location+"</td>");
+		$(this).append("<td>"+json[i].phone+"</td>");
+		$(this).append("<td>"+json[i].date+"</td>");
+		btns="<button class='layui-btn layui-btn-warm layui-btn-sm'><i class='layui-icon layui-icon-edit'></i>编辑</button>"+
+				"<button class='layui-btn layui-btn-danger layui-btn-sm' id='delete'><i class='layui-icon layui-icon-delete'></i>删除</button>";
+		$(this).append("<td>"+btns+"</td>");
+	})
+	
+	$('button#delete').each(function(i){
+		$(this).click(function(){
+			layer.confirm('确认删除吗？', {icon: 3, title:'删除用户信息'}, function(index){
+				$.post(
+						'adminController',
+						{'m':'deleteuser','id':json[i].id},
+						function(o){
+							if(o>0){
+								layer.msg('删除成功');
+								getUserList(0);
+							}else{
+								layer.msg('删除失败');
+							}
+						}
+					)
+				  layer.close(index);
+				});
+		})
+	})
+	
+}
+
+
+
+$(function(){
+	
+	getUserList(0);
+	
+	layui.form.on('select(query)', function(data){
+	  	opt=data.value;
+	  	getUserList(opt);
+	}); 
+	
+	$('#adduser').click(function(){
+		
+		parent.layer.open({
+			type:2
+			,title:'添加用户'
+			,content:['regsiter.html','no']
+			,btn:false
+			,area:['1080px','530px']
+		})
+	})
+	
+	$('#xlsdownload').click(function(){
+		downloadXls();
+	})
+})
+
+
+function getUserList(type){
+	$.post(
+		'adminController'
+		,{'m':'getuserlist','type':type}
+		,function(o){
+			showUserList(o);
+		}
+	)
+}
+
+</script>
+</html>

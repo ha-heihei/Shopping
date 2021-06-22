@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>订单详情</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+.container{
+	width: 100%;
+	height: 430px;
+	overflow: hidden;
+}
+.main{
+	display: block;
+	margin: 5px 300px;
+	border: 1px solid #f5f5f5;
+	background-color: white;
+	height: 420px;
+	width: 300px;
+	border-radius: 12px;
+}
+.test{
+	display: block;
+	margin-top: 15px;
+	margin-left:25px;
+	font-size: 15px;
+	font-family: cursive;
+	font-weight: 300;
+}
+.test div{
+	display: inline-block;
+}
+.test label {
+	display: inline-block;
+	margin: 0px 8px 0px 8px;
+}
+.img{
+	display: block;
+	width: 120px;
+	height: 80px;
+}
+.img img{
+	width: 100%;
+	height: 100%;
+}
+</style>
+</head>
+<body>
+<div class="container">
+	<div class="main">
+		<div class="test">
+			<label>商品图片：</label><div class="img"><img alt="" src=""></div>
+		</div>
+		<div class="test">
+			<label>商品名称：</label><div class="name"></div>
+		</div>
+		<div class="test">
+			<label>订单编号：</label><div class="order"></div>
+		</div>
+		<div class="test">
+			<label>商品单价：</label><div class="price"></div>
+		</div>
+		<div class="test">
+			<label>购买数量：</label><div class="num"></div>
+		</div>
+		<div class="test">
+			<label>付款金额：</label><div class="sum"></div>
+		</div>
+		<div class="test">
+			<label>交易时间：</label><div class="time"></div>
+		</div>
+		<div class="test">
+			<label>交易状态：</label><div class="status"></div>
+		</div>
+		<div class="test">
+			<label>收货地址：</label><div class="reciever"></div>
+		</div>
+		<div class="test">
+			<label>发货地址：</label><div class="send"></div>
+		</div>
+		<div class="test">
+			<label>商家电话：</label><div class="sellerphone"></div>
+		</div>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+$(function(){
+	var json;
+	var orderid=getUrlPara('orderid');
+	$.post(
+		'/shoppingplus/order_information',
+		{'orderid':orderid},
+		function(obj){
+			json=JSON.parse(obj);
+			$('img').attr('src','images/goods/'+json.imgurl);
+			$('.name').text(json.goods);
+			$('.order').text(json.id);
+			$('.sum').text(json.sum+"元");
+			$('.time').text(json.tradedate);
+			$('.status').text(json.tradestatus);
+			$('.reciever').text(json.buyerlocation);
+			$('.send').text(json.sellerlocation);
+			$('.num').text(json.num+"件");
+			$('.price').text(json.price+"元");
+			$('.sellerphone').text(json.sellerphone);
+			
+		}
+	)
+})
+</script>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>添加商品界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+.container{margin: 15px 470px 15px 270px;padding: 0px;}
+#upload{position: absolute;top: 15px;right: 350px;}
+#imgdiv{display: block;width: 90px;height: 90px;}
+#img{width: 100%;height: 100%;}
+</style>
+</head>
+<body>
+<div class="container">
+	<form action="add_goods" method="post" class="layui-form">
+		<input type="hidden" name="imgurl">
+		<input type="hidden" name="sellerid">
+		<input type="hidden" name="seller">
+		<div class="layui-form-item" id="div1">
+			<label class="layui-form-label">商品名称</label>
+			<div class="layui-input-block">
+				<input class="layui-input" type="text" placeholder="请输入商品名称" name="name">
+			</div>
+		</div>
+		<div class="layui-upload" id="upload">
+			  <button type="button" class="layui-btn" id="test1">商品图片</button>
+			  <div class="layui-upload-list" id="imgdiv">
+			    <img class="layui-upload-img" id="img">
+			    <p id="demoText"></p>
+			  </div>
+		 </div> 
+		<div class="layui-form-item">
+		    <label class="layui-form-label">商品类型</label>
+		    <div class="layui-input-block">
+		      <select name="type" lay-verify="required">
+		        <option value="">请选择商品类型</option>
+		        <option value="0">运动服饰</option>
+		        <option value="1">居家服饰</option>
+		        <option value="2">情侣专卖</option>
+		        <option value="3">美妆服饰</option>
+		        <option value="4">老年服饰</option>
+		      </select>
+		    </div>
+		  </div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品单价</label>
+			<div class="layui-input-block">
+				<input class="layui-input" type="number" placeholder="请输入商品单价" name="price">
+			</div>
+		</div>
+		<div class="layui-form-item">
+		    <label class="layui-form-label">库存量</label>
+		    <div class="layui-input-block">
+		   		<input class="layui-input" type="number" placeholder="请输入库存量" name="nownum">
+		    </div>
+		</div>
+		  <div class="layui-form-item layui-form-text">
+		    <label class="layui-form-label">商品详情</label>
+		    <div class="layui-input-block">
+		      <textarea name="remark" placeholder="请输入内容" class="layui-textarea"></textarea>
+		    </div>
+		  </div>
+		<div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+		      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+		    </div>
+		</div>
+	</form>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+$('input[name=sellerid]').val(getUrlPara('sellerid'));
+$('input[name=seller]').val(decodeURIComponent(getUrlPara('seller')));
+layui.use('form', function(){
+	  var form = layui.form;
+});
+layui.use('upload', function(){          //商品图片
+	  var $ = layui.jquery
+	  ,upload = layui.upload;
+	  
+	  //普通图片上传
+	  var uploadInst = upload.render({
+	    elem: '#test1'
+	    ,url: '/shoppingplus/goods_img' //改成您自己的上传接口
+	    ,before: function(obj){
+	      //预读本地文件示例，不支持ie8
+	      obj.preview(function(index, file, result){
+	        $('#img').attr('src', result); //图片链接（base64）
+	      });
+	    }
+	    ,done: function(res){
+	      //如果上传失败
+	      if(res.code==0)
+	    	  $('input[name=imgurl]').val(res.msg);
+	      if(res.code > 0){
+	        return layer.msg('上传失败');
+	      }
+	      //上传成功
+	    }
+	    ,error: function(){
+	      //演示失败状态，并实现重传
+	      var demoText = $('#demoText');
+	      demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+	      demoText.find('.demo-reload').on('click', function(){
+	        uploadInst.upload();
+	      });
+	    }
+	  });
+	});
+</script>
+</html>

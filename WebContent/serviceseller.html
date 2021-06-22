@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>商家界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+img{width: 80px;height: 80px;}
+</style>
+</head>
+<body>
+<div class="container">
+	<table class="layui-table" >
+	<thead>
+		<tr>
+			<td>订单编号</td>
+			<td>商品名称</td>
+			<td>商品图片</td>
+			<td>交易数量</td>
+			<td>总金额</td>
+			<td>交易时间</td>
+			<td>买家昵称</td>
+			<td>请求类型</td>
+			<td>操作</td>
+		</tr>
+	</thead>
+	<tbody class="main">
+		
+	</tbody>
+	</table>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+$(function(){
+	var json;
+	var size;
+	var type,type1;
+	var sellerid=getUrlPara('sellerid');
+	$.post(
+		'/shoppingplus/service_seller',
+		{'sellerid':sellerid},
+		function(obj){
+			json=JSON.parse(obj);
+			size=json.length;
+			tr='<tr></tr>';
+			if(size<1)
+				$('body').html('还没有售后通知哦').css({'margin':'auto','text-align':'center','margin-top':'150px','font-size':'45px','font-family':'cursive','font-weight':'800'});
+			else{
+				for(i=0;i<size;i++)
+					$('.main').append(tr);
+				$('.main tr').each(function(i){
+					$(this).append("<td class='layui-elip'><a>"+json[i].id+"</a></td>");
+					$(this).append("<td class='layui-elip'>"+json[i].goods+"</td>");
+					$(this).append("<td><img></td>");
+					$(this).append("<td class='layui-elip'>"+json[i].num+"件</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].sum+"元</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].tradedate+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].buyer+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].tradestatus+"</td>");
+					$(this).append("<td><button class='layui-btn layui-btn-radius' id='yes'>同意</button>"+
+							"<button class='layui-btn layui-btn-radius' id='no'>拒绝</button></td>");
+				})
+				$('.main img').each(function(i){
+					$(this).attr('src','images/goods/'+json[i].imgurl);
+				})
+				$('a').each(function(i){
+					$(this).attr('href','./ordersinformation.html?orderid='+json[i].id);
+				})
+				$('#yes').each(function(i){      //同意事件触发
+					if(json[i].tradestatus=='请求退货')
+						type1="1";
+					if(json[i].tradestatus=='请求换货')
+						type1="2";
+					$(this).click(function(){
+						$.post(
+							'/shoppingplus/customer_service',
+							{'orderid':json[i].id,'type':type1},
+							function(msg){
+								layer.msg(msg);
+								setTimeout(function(){location.reload();},1000);
+							}
+						)
+					})
+				})
+				$('#no').each(function(i){      //拒绝事件触发
+					if(json[i].tradestatus=='请求退货')
+						type="3";
+					if(json[i].tradestatus=='请求换货')
+						type="4";
+					$(this).click(function(){
+						$.post(
+							'/shoppingplus/customer_service',
+							{'orderid':json[i].id,'type':type},
+							function(msg){
+								layer.msg(msg);
+								setTimeout(function(){location.reload();},1000);
+							}
+						)
+					})
+				})
+				
+			}
+		}
+	)
+})
+</script>
+</html>

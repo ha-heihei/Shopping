@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>登陆界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<link href="css/index_style.css" rel="stylesheet" type="text/css">
+<link href="css/login.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<!-- 星空背景特效模块 -->
+<div class="header" id="demo">
+  <div class="canvaszz"> 
+	<div class="container">
+		<div class="top">fmall购物，享受品质生活</div>
+		<div class="main">
+			<div class="font">登陆界面</div>
+			<hr class="layui-bg-blue">
+			<div class="username">
+				<label>登录名</label>
+				<input type="text" name="name">
+			</div>
+			<div class="pwd">
+				<label>密码</label>
+				<input type="password" name="pwd">
+			</div>
+			<div class="checkcode"> 
+				<label>验证码</label>
+				<input type="text" name="checkcode">
+				<img alt="验证码" src="/shoppingplus/getcheckcode" class="code">
+			</div>
+			<div class="btn">
+				<button class="layui-btn">登陆</button>
+				<button class="layui-btn">注册</button>
+			</div>
+		</div>
+	</div>
+	
+  </div>
+  <canvas id="canvas" ></canvas> 
+</div>
+<!-- 星空背景特效模块END --> 
+
+
+
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+$(".code").click(function(){     //刷新验证码
+	$(this).attr("src",$(this).attr("src")+"?");
+})
+
+$(".layui-btn:eq(0)").click(function(){   //点击登陆
+	name=$("input[name=name]").val();
+	pwd=$('input[name=pwd]').val();
+	checkcode=$('input[name=checkcode]').val();
+	if(name==""||pwd==""||checkcode=="")
+		layer.msg('请将信息填写完整');
+	else{
+		$.post(
+				'/shoppingplus/checklogin',
+				{'name':name,'pwd':pwd,'checkcode':checkcode},
+				function(msg){
+					status=msg.split(";")[0];
+					id=msg.split(";")[1];
+					if(status!='0'&&status!='-1'&&status!='-2'){
+						layer.msg('登陆成功');
+						setTimeout(function(){
+							if(status=='1')
+								window.location='./buyerindex.html?id='+id;
+							if(status=='2')
+								window.location='./sellerindex.html?id='+id;
+							if(status=='3')
+								window.location='./adminindex.html?id='+id;
+						},1000);
+					}else if(status=='0')
+						layer.msg('用户名或密码错误，请核对后重新登陆');
+					else if(status=='-1')
+						layer.msg('验证码错误，字母不区分大小写');
+					else if(status=='-2')
+						layer.msg('该账号已在线，请勿重复登陆');
+				}
+			)
+	}
+})
+$('.layui-btn:eq(1)').click(function(){      //跳转注册页面
+	window.location='./regsiter.html';
+})
+</script>
+<!-- 炫彩背景 -->
+<script type="text/javascript" src="js/starbg.js"></script>
+</body>
+</html>

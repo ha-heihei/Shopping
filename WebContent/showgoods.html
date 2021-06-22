@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>商品界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+.container{width: 100%;height: 500px;display: inline-block;}
+.items{margin-left: 60px;}
+.item{display: inline-block;width: 280px;height: 350px;margin: 8px;background-color: white;border: 1px solid white;}
+.item:hover{border: 1px solid red; }
+.name{display: block;width: 100px;height: 22px;text-align: center;margin: auto;}
+.name label{font-weight: 550;font-size: 20px;}
+.img{display: block;width: 230px;height: 250px;margin: 15px 25px;}
+.img img{width: 100%;height: 100%;}
+.price{display: block;width: 100px;height: 22px;text-align: center;margin: auto;margin-top: 8px;margin-left: -8px;}
+.price label {font-weight: 650;font-size: 20px;color: red;}
+</style>
+</head>
+<body>
+<div class="container">
+	<div class="items">
+	</div>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+$(function(){
+			var id=getUrlPara('id');
+			var name=getUrlPara('name');
+			name=decodeURIComponent(name);
+			var json;
+			var size;
+			$.post(
+				'/shoppingplus/show_goods',
+				{'name':name},
+				function(obj){
+					json=JSON.parse(obj);
+					size=json.length;
+					if(size>0){
+						var item="<div class='item'></div>";
+						for(i=0;i<size;i++)
+							$('.items').append(item);
+						$('.item').each(function(i){
+							var div="<div class='img'><a><img></img></a></div>"+
+							"<div class='name'><label>"+json[i].name+"</label</div>"
+							+"<div class='price'><label>￥"+json[i].price+"</label></div>";
+							$(this).append(div);
+						})	
+						$('.item').each(function(i){
+							$(this).find('a').attr('href','./showeverygoods.html?id='+id+'&goodsid='+json[i].id);
+							$(this).find('img').attr('src','images/goods/'+json[i].imgurl);
+						})
+					}else 
+						$('.items').text('无相关物品信息').css({'font-size':'45px','margin':'190px','text-align':'center'});
+				}
+			)
+			
+})
+
+</script>
+</html>

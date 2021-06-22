@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>管理员界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+.frame{width: 100%;height: 100%;border: 0px;}
+.frame iframe{width: 100%;height: 100%;border: 0px;background-color:#f5f5f5; }
+.search input{display: inline-block;width: 400px;margin: 12px 0px 0px 400px;}
+.search button{display: inline-block;margin:12px 0px 15px;width: 80px; }
+</style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo" style="font-size: 35px;font-family: cursive;">后台管理</div>
+   
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="" class="layui-nav-img" id="img"><span class="name"></span>
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+          <dd><a href="javascript:;" id="test1">更换头像</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a href="login.html" id="out">退了</a></li>
+    </ul>
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+        <li class="layui-nav-item">
+          <a href="javascript:;" id="user">用户管理</a>
+        </li>
+        <li class="layui-nav-item"><a href="javascript:;" id="goods">商品管理</a></li>
+        <li class="layui-nav-item"><a href="javascript:;" id="charge">订单管理</a></li>
+        <li class="layui-nav-item"><a href="https://home.cnblogs.com/u/haheihei/" target="_blank">关于我们</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body" style="overflow: hidden;">
+    <div class="frame"><iframe src="" name="frame_a" id="frame_a"></iframe></div>
+  </div>
+  
+  <div class="layui-footer">
+    © fmall购物，享受品质生活
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+var id=getUrlPara("id");
+$('#user').click(function(){
+	$('#frame_a').attr('src','showuser.html');
+})
+$('#charge').click(function(){
+	$('#frame_a').attr('src','showorders.html?ran='+Math.random());
+})
+$('#goods').click(function(){
+	$('#frame_a').attr('src','goods.html?ran='+Math.random());
+})
+
+$(function(){                  //获取用户名、图片修饰
+	$.post(
+		'/shoppingplus/getUsername',
+		{"id":getUrlPara("id")},
+		function(msg){
+			name=msg.split(';')[0];
+			url=msg.split(';')[1];
+			$('.name').text(name);
+			$('#img').attr('src',"images/user/"+url);
+		}
+	)
+	
+})
+
+layui.use('upload', function(){          //更换头像
+	var $ = layui.jquery
+	  ,upload = layui.upload;
+	  
+	  //普通图片上传
+	  var uploadInst = upload.render({
+	    elem: '#test1'
+	    ,url: '/shoppingplus/changeimg?id='+id 
+	    ,done: function(res){
+	      if(res.code > 0){     //如果上传失败
+	        return layer.msg('上传失败');
+	      }else if(res.code==0){
+	    	  $('#img').attr('src','images/user/'+res.msg);
+	    	  return layer.msg('上传成功');
+	      }
+	      //上传成功
+	    }
+	  });
+	});
+</script>
+</html>

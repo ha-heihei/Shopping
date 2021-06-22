@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>速购猫</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<style type="text/css">
+.container{margin: auto;background-color: #f5f5f5;width: 100%;height: 100%;}
+.top-tab{padding-top: 8px;padding-bottom: 5px;}
+.top-tab a{font-size: 12px;font-weight: 400;}
+.search{margin: 0px 0px;background-color: white;height:80px;padding-top: 30px;}
+.search label{font-size: 65px;color: #009688;font-weight: 800;font-family: cursive;}
+.layui-carousel img{width: 100%;height: 100%;}
+.digit-items div{height: 350px;text-align: center;float: left;width: 250px;background-color: white;display: inline-block;margin: 10px;}
+.life-items div{height: 350px;text-align: center;float: left;width: 250px;background-color: white;display: inline-block;margin: 10px;}
+.footer{margin: 20px 0px 0px;text-align: center;font-family: cursive;font-size: 25px;font-weight: 550px;height: 80px;background-color: #009688;padding-top: 40px;color: white;border-top-left-radius: 60px;border-top-right-radius: 60px;}
+</style>
+</head>
+<body>
+<div class="container">
+	<div class="top-tab" style="margin-left: 8px;float: left;">
+		<span class="layui-breadcrumb" lay-separator="  ">
+			<a href="javascript:;">喵,欢迎您</a>
+			<a href="javascript:;">请登录</a>
+			<a href="javascript:;">免费注册</a>
+		</span>
+	</div>
+	<div class="top-tab" style="margin-right: 8px;float: right;">
+		<span class="layui-breadcrumb" lay-separator="  ">
+			<a href="javascript:;"><i class="layui-icon layui-icon-user"></i>我的淘宝</a>
+			<a href="javascript:;"><i class="layui-icon layui-icon-cart"></i>购物车</a>
+		</span>
+	</div>
+	<div style="clear: both;"></div>
+	<div class="search">
+		<form action="" class="layui-form" target="_blank">
+			<div class="layui-form-item">
+				<label class="layui-form-label">fmall</label>
+				<div class="layui-input-block" style="float: left;padding-left: 130px;">
+					<input type="text" autocomplete="off" class="layui-input" lay-verify="required" required placeholder="搜索：商品名称" name="name"  style="padding-left: 8px;width: 500px;">
+				</div>
+				<div class="layui-input-block" style="float: left;margin-left: 0px;">
+					<button class="layui-btn" style="width: 100px;">搜索</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="nav">
+		<ul class="layui-nav layui-bg-green" lay-filter="">
+		  <li class="layui-nav-item">
+		  	<a href="javascript:;">商品导航</a>
+		    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+		      <dd><a href="">数码/相机/电脑</a></dd>
+		      <dd><a href="">生活超市</a></dd>
+		      <dd><a href="">锻炼器材</a></dd>
+		      <dd><a href="">大牌特惠</a></dd>
+		    </dl>
+		  </li>
+		  <li class="layui-nav-item"><a href="javascript:;">最新活动</a></li>
+		  <li class="layui-nav-item"><a href="javascript:;">最热商品</a></li>
+		  <li class="layui-nav-item"><a href="javascript:;">数码科技</a></li>
+		  <li class="layui-nav-item"><a href="javascript:;">日常用品</a></li>
+		</ul>
+	</div>
+	<div class="layui-carousel" id="rotate" style="margin-bottom: 20px;">
+		<div carousel-item>
+		    <div><img alt="" src="images/1.jpg"></div>
+		    <div><img alt="" src="images/2.jpg"></div>
+		    <div><img alt="" src="images/3.jpg"></div>
+		    <div><img alt="" src="images/4.jpg"></div>
+		    <div><img alt="" src="images/5.jpg"></div>
+		</div>
+	</div>
+	<div class="digit-items-top" style="margin-top: 15px;">
+		<p style="font-size: 20px;font-weight: 700;padding-left: 8px; ">数码用品</p>
+		<hr class="layui-bg-green">
+	</div>
+	<div class="digit-items" style="display: flex;">
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+	</div>
+	<div class="digit-items" style="display: flex;">
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+	</div>
+	<div class="life-items-top" style="margin-top: 15px;">
+		<p style="font-size: 20px;font-weight: 700;padding-left: 8px; ">生活用品</p>
+		<hr class="layui-bg-green">
+	</div>
+	<div class="life-items" style="display: flex;">
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+	</div>
+	<div class="life-items" style="display: flex;">
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+	</div>
+	<hr class="layui-bg-gray">
+	<div class="footer">fmall购物，用心服务</div>
+	
+</div>
+</body>
+<script src="js\jquery-1.11.0.min.js"></script>
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+layui.use('carousel', function(){
+	  var carousel = layui.carousel;
+	  //建造实例
+	  carousel.render({
+	    elem: '#rotate'
+	    ,width: '100%' //设置容器宽度
+	    ,height:'450px'
+	    ,arrow: 'always' //始终显示箭头
+	    //,anim: 'updown' //切换动画方式
+	  });
+	});
+layui.use('form', function(){
+	  var form = layui.form;
+	  
+	  //监听提交
+	  form.on('submit(formDemo)', function(data){
+	    layer.msg(JSON.stringify(data.field));
+	    return false;
+	  });
+	});
+//JavaScript代码区域
+layui.use('element', function(){
+  var element = layui.element;
+
+});
+</script>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>商家界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+img{width: 80px;height: 80px;}
+</style>
+</head>
+<body>
+<div class="container">
+	<table class="layui-table" lay-size="sm">
+	<thead>
+		<tr>
+			<td>商品编码</td>
+			<td>商品名称</td>
+			<td>商品图片</td>
+			<td>单价</td>
+			<td>库存量</td>
+			<td>详情</td>
+			<td>商品类型</td>
+			<td>上架时间</td>
+			<td>商品状态</td>
+			<td>操作</td>
+		</tr>
+	</thead>
+	<tbody class="main">
+		
+	</tbody>
+	</table>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+$(function(){
+	var json;
+	var size;
+	var sellerid=getUrlPara('sellerid');
+	$.post(
+		'/shoppingplus/show_mygoods',
+		{'sellerid':sellerid},
+		function(obj){
+			json=JSON.parse(obj);
+			size=json.length;
+			tr='<tr></tr>';
+			if(size<1)
+				$('body').html('还没有发布商品哦').css({'margin':'auto','text-align':'center','margin-top':'150px','font-size':'45px','font-family':'cursive','font-weight':'800'});
+			else{
+				for(i=0;i<size;i++)
+					$('.main').append(tr);
+				$('.main tr').each(function(i){
+					$(this).append("<td class='layui-elip'>"+json[i].id+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].name+"</td>");
+					$(this).append("<td><img></td>");
+					$(this).append("<td class='layui-elip'>"+json[i].price+"元</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].nownum+"件</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].remark+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].type+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].date.split(" ")[0]+"<br>"+json[i].date.split(" ")[1]+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].status+"</td>");
+					if(json[i].status=='已上架')
+						$(this).append("<td><button class='layui-btn layui-btn-radius layui-btn-sm' id='down'>下架</button></td>");
+					else if(json[i].status=='已下架')
+						$(this).append("<td><button class='layui-btn layui-btn-radius layui-btn-sm' id='up'>上架</button>"+
+						"<button class='layui-btn layui-btn-radius layui-btn-sm' id='delete'><i class='layui-icon layui-icon-delete'></i>删除</button></td>");
+				})
+				$('.main img').each(function(i){
+					$(this).attr('src','images/goods/'+json[i].imgurl);
+				})
+				$('.main tr').each(function(i){
+					$(this).find('#down').click(function(){        //商品下架
+						$.post(
+							'/shoppingplus/goods_status',
+							{'goodsid':json[i].id,'type':0},
+							function(msg){
+								layer.msg(msg);
+								setTimeout(function(){location.reload();},1000);
+							}
+						)
+					})
+					$(this).find('#up').click(function(){         //商品上架
+						$.post(
+							'/shoppingplus/goods_status',
+							{'goodsid':json[i].id,'type':1},
+							function(msg){
+								layer.msg(msg);
+								setTimeout(function(){location.reload();},1000);
+							}
+						)
+					})
+					$(this).find('#delete').click(function(){     //商品删除
+						$.post(
+							'/shoppingplus/goods_status',
+							{'goodsid':json[i].id,'type':2},
+							function(msg){
+								layer.msg(msg);
+								setTimeout(function(){location.reload();},1000);
+							}
+						)
+					})
+					
+				})
+			}
+		}
+	)
+})
+</script>
+</html>

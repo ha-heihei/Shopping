@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>商家界面</title>
+<link rel="stylesheet" href="layui/css/layui.css">
+<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="js/selfjs.js"></script>
+<style type="text/css">
+img{width: 80px;height: 80px;}
+</style>
+</head>
+<body>
+<div class="container">
+	<table class="layui-table" >
+	<thead>
+		<tr>
+			<td>订单编号</td>
+			<td>商品名称</td>
+			<td>商品图片</td>
+			<td>交易数量</td>
+			<td>总金额</td>
+			<td>交易时间</td>
+			<td>订单状态</td>
+			<td>操作</td>
+		</tr>
+	</thead>
+	<tbody class="main">
+		
+	</tbody>
+	</table>
+</div>
+</body>
+<script type="text/javascript" src="layui/layui.all.js"></script>
+<script type="text/javascript">
+$(function(){
+	var json;
+	var size;
+	var sellerid=getUrlPara('sellerid');
+	$.post(
+		'/shoppingplus/seller_orders',
+		{'sellerid':sellerid},
+		function(obj){
+			json=JSON.parse(obj);
+			size=json.length;
+			tr='<tr></tr>';
+			if(size<1)
+				$('body').html('还没有订单哦').css({'margin':'auto','text-align':'center','margin-top':'150px','font-size':'45px','font-family':'cursive','font-weight':'800'});
+			else{
+				for(i=0;i<size;i++)
+					$('.main').append(tr);
+				$('.main tr').each(function(i){
+					$(this).append("<td class='layui-elip'><a>"+json[i].id+"</a></td>");
+					$(this).append("<td class='layui-elip'>"+json[i].goods+"</td>");
+					$(this).append("<td><img></td>");
+					$(this).append("<td class='layui-elip'>"+json[i].num+"件</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].sum+"元</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].tradedate+"</td>");
+					$(this).append("<td class='layui-elip'>"+json[i].tradestatus+"</td>");
+					$(this).append("<td><button class='layui-btn layui-btn-radius' id='delete'><i class='layui-icon layui-icon-delete'></i>删除订单</button></td>");
+				})
+				$('.main img').each(function(i){
+					$(this).attr('src','images/goods/'+json[i].imgurl);
+				})
+				$('a').each(function(i){
+					$(this).attr('href','./ordersinformation.html?orderid='+json[i].id);
+				})
+				
+				$('#delete').each(function(i){
+					$(this).click(function(){
+						$.post(
+							'/shoppingplus/delete_status',
+							{'orderid':json[i].id,"type":2},
+							function(msg){
+								layer.msg(msg);
+								setTimeout(function(){location.reload();},1000);
+							}
+						)
+					})
+				})
+				
+			}
+		}
+	)
+})
+</script>
+</html>
